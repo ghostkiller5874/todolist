@@ -1,0 +1,41 @@
+# ignore phpUnit
+/.phpunit.cache
+.phpunit.result.cache
+
+# ignore node_modules
+/node_modules
+/node_modules/*
+
+# ignore path public
+/public/build
+/public/hot
+/public/storage
+
+# ignore storage
+/storage/*.key
+/storage/pail
+
+# ignore vendor
+/vendor
+/vendor/*
+
+# ignore .env's
+.env
+.env.backup
+.env.production
+
+# ignore phpActor
+.phpactor.json
+
+# ignore another files
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/auth.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+todo.txt
