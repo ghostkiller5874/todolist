@@ -6,9 +6,15 @@ use Illuminate\Http\Request;
 
 // MODELS
 use App\Models\Task;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
+    private $task;
+    public function __construct(Task $task)
+    {
+        $this->task = $task;
+    }
     /**
      * Mostra todas as tasks do usuario, exceto as deletadas
      */
@@ -34,8 +40,34 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $task = Task::create($request->all());
-        return $task;
+
+        $request->validate($this->task->rules(), $this->task->feedback());
+        if ($request->hasFile("arquivo")) {
+            $file = $request->file('arquivo');
+            $extension = $request->file('arquivo')->getClientOriginalExtension();
+            $folder = $this->extFiles($extension);
+
+            //  dd([
+            //     "arquivo" => $file,
+            //     "extensoes" => $extension,
+            //     "diretorio pos extensoes" => $folder
+            // ]);
+
+            $path = $file->store('arquivos' . $folder, 's3', 'public');
+            $url = Storage::disk('s3')->url($path);
+        }
+
+
+        // $task = Task::create($request->all());
+
+        $task = Task::create([
+            // "user_id" => auth()->id(),
+            "user_id" => 1,
+            "title" => $request->title,
+            "description" => $request->description ?? null,
+            "attachment_url" => $url ?? null
+        ]);
+        return response()->json($task, 201);
     }
 
     /**
@@ -53,18 +85,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-        return ['msg'=>'Task apagada'];
-    }
-
-    /**
-     * Apenas o dono da tarefa tem acesso a ela
-     * @param Task $task
-     */
-    private function authorizeTask(Task $task)
-    {
-        if ($task->user_id !== auth()) {
-            abort(403, 'Acesso não autorizado.');
-        }
+        return ['msg' => 'Task apagada'];
     }
 
     /**
@@ -73,8 +94,50 @@ class TaskController extends Controller
     public function deleted()
     {
         // Tem que puxar as tasks deletadas, baseado no deleted_at
-        $task = Task::all('deleted_at');
+        // $task = Task::all('deleted_at');
+
+        $tasks = Task::onlyTrashed()
+            // ->where('user_id', auth()->id())
+            ->where('user_id', 1)
+            ->get();
+
+        return response()->json($tasks);
         return $task;
     }
 
+    /**
+     * Apenas o dono da tarefa tem acesso a ela
+     * @param Task $task
+     */
+    private function authorizeTask(Task $task)
+    {
+        // if ($task->user_id !== auth()->id()) {
+        if ($task->user_id !== 1) {
+            abort(403, 'Acesso não autorizado.');
+        }
+    }
+
+    /**
+     * Retorna o diretorio apropriado para cada tipo de arquivo
+     */
+    private function extFiles($path)
+    {
+        switch (strtolower($path)) {
+            case 'png':
+            case 'jpg':
+            case 'jpeg':
+                return '/images';
+
+            case 'doc':
+            case 'docx':
+            case 'txt':
+                return '/documents';
+
+            case 'pdf':
+                return '/pdf';
+
+            default:
+                return '';
+        }
+    }
 }

@@ -17,8 +17,28 @@ class Task extends Model
         'attachment_url'
     ];
 
+    
+    public function rules()
+    {
+        return [
+            "title" => "required|max:255",
+            "description" => "nullable",
+            "attachment_url" => "nullable|file|mimes:pdf,docx,doc,txt,jpg,jpeg,png"
+        ];
+    }
+
+    public function feedback() 
+    {
+        return [
+            "required" => "O campo :attribute é obrigatório!",
+            "title.max" => "Este campo suporta no maximo 255 caracteres!",
+            "attachment_url.mimes" => "São permitidos apenas aquivos PDF, de texto(DOCX, DOC, TXT) e imagens(JPG, JPEG, PNG)!"
+        ];
+    }
+
     public function user()
     {
+        // uma task pertence a um usuario
         return $this->belongsTo(User::class);
     }
 }
