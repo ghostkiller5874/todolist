@@ -20,8 +20,11 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $task = Task::all();
-        return $task;
+        $tasks = Task::where('user_id', auth()->id())
+            ->whereNull('deleted_at')
+            ->paginate(10);
+
+        return response()->json($tasks);
     }
 
     /**
@@ -42,29 +45,31 @@ class TaskController extends Controller
     {
 
         $request->validate($this->task->rules(), $this->task->feedback());
-        if ($request->hasFile("arquivo")) {
-            $file = $request->file('arquivo');
-            $extension = $request->file('arquivo')->getClientOriginalExtension();
-            $folder = $this->extFiles($extension);
+        // if ($request->hasFile("arquivo")) {
+        //     $file = $request->file('arquivo');
+        //     $extension = $request->file('arquivo')->getClientOriginalExtension();
+        //     $folder = $this->extFiles($extension);
 
-            //  dd([
-            //     "arquivo" => $file,
-            //     "extensoes" => $extension,
-            //     "diretorio pos extensoes" => $folder
-            // ]);
+        //     //  dd([
+        //     //     "arquivo" => $file,
+        //     //     "extensoes" => $extension,
+        //     //     "diretorio pos extensoes" => $folder
+        //     // ]);
 
-            $path = $file->store('arquivos' . $folder, 's3', 'public');
-            $url = Storage::disk('s3')->url($path);
-        }
+        //     $path = $file->store('arquivos' . $folder, 's3', 'public');
+        //     $url = Storage::disk('s3')->url($path);
+        // }
 
 
         // $task = Task::create($request->all());
+        $descricao = filter_var($request->description, FILTER_SANITIZE_SPECIAL_CHARS);
+        $title = filter_var($request->title, FILTER_SANITIZE_SPECIAL_CHARS);
 
+        dd([$descricao, $title]);
         $task = Task::create([
-            // "user_id" => auth()->id(),
-            "user_id" => 1,
-            "title" => $request->title,
-            "description" => $request->description ?? null,
+            "user_id" => auth()->id(),
+            "title" => $title,
+            "description" => $descricao ?? null,
             "attachment_url" => $url ?? null
         ]);
         return response()->json($task, 201);
@@ -97,8 +102,7 @@ class TaskController extends Controller
         // $task = Task::all('deleted_at');
 
         $tasks = Task::onlyTrashed()
-            // ->where('user_id', auth()->id())
-            ->where('user_id', 1)
+            ->where('user_id', auth()->id())
             ->get();
 
         return response()->json($tasks);
