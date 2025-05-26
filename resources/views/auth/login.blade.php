@@ -16,6 +16,7 @@
             </div>
             <button class="btn btn-primary">Entrar</button>
         </form>
+        <a href="{{ route('register') }}" class="mt-3">Cadastre-se conosco!</a>
     </div>
 </div>
 @endsection

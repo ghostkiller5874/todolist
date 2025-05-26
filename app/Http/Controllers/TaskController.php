@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 // MODELS
 use App\Models\Task;
-use Illuminate\Support\Facades\Storage;
+
 
 class TaskController extends Controller
 {
@@ -20,10 +21,10 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::where('user_id', auth()->id())
+        $tasks = $this->task->where('user_id', auth()->id())
             ->whereNull('deleted_at')
             ->paginate(10);
-
+        // $tasks= Task::all();
         return response()->json($tasks);
     }
 
@@ -45,31 +46,30 @@ class TaskController extends Controller
     {
 
         $request->validate($this->task->rules(), $this->task->feedback());
-        // if ($request->hasFile("arquivo")) {
-        //     $file = $request->file('arquivo');
-        //     $extension = $request->file('arquivo')->getClientOriginalExtension();
-        //     $folder = $this->extFiles($extension);
+        if ($request->hasFile("arquivo")) {
+            $file = $request->file('arquivo');
+            $extension = $request->file('arquivo')->getClientOriginalExtension();
+            $folder = $this->extFiles($extension);
 
-        //     //  dd([
-        //     //     "arquivo" => $file,
-        //     //     "extensoes" => $extension,
-        //     //     "diretorio pos extensoes" => $folder
-        //     // ]);
+            //  dd([
+            //     "arquivo" => $file,
+            //     "extensoes" => $extension,
+            //     "diretorio pos extensoes" => $folder
+            // ]);
 
-        //     $path = $file->store('arquivos' . $folder, 's3', 'public');
-        //     $url = Storage::disk('s3')->url($path);
-        // }
+            $path = $file->store('arquivos' . $folder, 's3', 'public');
+            $url = Storage::disk('s3')->url($path);
+        }
 
 
-        // $task = Task::create($request->all());
-        $descricao = filter_var($request->description, FILTER_SANITIZE_SPECIAL_CHARS);
-        $title = filter_var($request->title, FILTER_SANITIZE_SPECIAL_CHARS);
+        $description = $this->filtro($request->description);
+        $title = $this->filtro($request->title);
 
-        dd([$descricao, $title]);
-        $task = Task::create([
+        // dd([$description, $title]);
+        $task = $this->task->create([
             "user_id" => auth()->id(),
             "title" => $title,
-            "description" => $descricao ?? null,
+            "description" => $description ?? null,
             "attachment_url" => $url ?? null
         ]);
         return response()->json($task, 201);
@@ -80,8 +80,32 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $task->update($request->all());
-        return $task;
+
+        $this->authorizeTask($task);
+
+        $validated = $request->validate($this->task->rules(), $this->task->feedback());
+
+        if ($request->hasFile('arquivo')) {
+            // Se já tiver um arquivo, exclui
+            if ($task->attachment_url) {
+                $this->deleteFromS3($task->attachment_url);
+            }
+
+            $file = $request->file('arquivo');
+            $extension = $request->file('arquivo')->getClientOriginalExtension();
+            $folder = $this->extFiles($extension);
+
+            $path = $file->store('arquivos' . $folder, 's3', 'public');
+            $url = Storage::disk('s3')->url($path);
+        }
+
+        $task->update([
+            'title' => $this->filtro($validated['title']) ?? $this->filtro($task->title),
+            'description' => $this->filtro($validated['description']) ?? $this->filtro($task->description),
+            'attachment_url' => $url ?? null,
+        ]);
+
+        return response()->json($task, 200);
     }
 
     /**
@@ -89,8 +113,9 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $this->authorizeTask($task);
         $task->delete();
-        return ['msg' => 'Task apagada'];
+        return response()->json(['message' => 'Tarefa excluída com sucesso.'], 200);
     }
 
     /**
@@ -98,15 +123,16 @@ class TaskController extends Controller
      */
     public function deleted()
     {
-        // Tem que puxar as tasks deletadas, baseado no deleted_at
-        // $task = Task::all('deleted_at');
-
-        $tasks = Task::onlyTrashed()
+        $tasks = $this->task->onlyTrashed()
             ->where('user_id', auth()->id())
             ->get();
 
+        if ($tasks->isEmpty()) {
+            return response()->json(['message' => 'Nenhuma tarefa deletada encontrada.'], 404);
+        }
+
         return response()->json($tasks);
-        return $task;
+        // return $task;
     }
 
     /**
@@ -115,8 +141,7 @@ class TaskController extends Controller
      */
     private function authorizeTask(Task $task)
     {
-        // if ($task->user_id !== auth()->id()) {
-        if ($task->user_id !== 1) {
+        if ($task->user_id !== auth()->id()) {
             abort(403, 'Acesso não autorizado.');
         }
     }
@@ -143,5 +168,11 @@ class TaskController extends Controller
             default:
                 return '';
         }
+    }
+
+    private function filtro($filtro)
+    {
+        $stringNova = filter_var($filtro, FILTER_SANITIZE_SPECIAL_CHARS);
+        return $stringNova;
     }
 }

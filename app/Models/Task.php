@@ -16,7 +16,6 @@ class Task extends Model
         'description',
         'attachment_url'
     ];
-
     
     public function rules()
     {

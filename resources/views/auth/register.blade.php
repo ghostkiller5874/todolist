@@ -6,6 +6,7 @@
     <div class="card-body">
         <form method="POST" action="{{ route('register') }}">
             @csrf
+            {{-- <input type="hidden" name="_token" value="{{@csrf_token()}}"/> --}}
             <div class="mb-3">
                 <label>Nome</label>
                 <input type="text" name="name" class="form-control" required>
@@ -18,12 +19,9 @@
                 <label>Senha</label>
                 <input type="password" name="password" class="form-control" required>
             </div>
-            <div class="mb-3">
-                <label>Confirme a Senha</label>
-                <input type="password" name="password_confirmation" class="form-control" required>
-            </div>
             <button class="btn btn-primary">Cadastrar</button>
         </form>
+        <a href="{{ route('login') }}" class="mt-3">Já tem conta? Login</a>
     </div>
 </div>
 @endsection
