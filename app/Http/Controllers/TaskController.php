@@ -7,24 +7,33 @@ use Illuminate\Support\Facades\Storage;
 
 // MODELS
 use App\Models\Task;
+<<<<<<< HEAD
 
+=======
+use App\Services\TaskService;
+>>>>>>> dev
 
 class TaskController extends Controller
 {
-    private $task;
-    public function __construct(Task $task)
+    public function __construct(private Task $task, private TaskService $taskService)
     {
+        $this->taskService = $taskService;
         $this->task = $task;
     }
+
     /**
      * Mostra todas as tasks do usuario, exceto as deletadas
      */
     public function index()
     {
+<<<<<<< HEAD
         $tasks = $this->task->where('user_id', auth()->id())
             ->whereNull('deleted_at')
             ->paginate(10);
         // $tasks= Task::all();
+=======
+        $tasks = $this->taskService->getAllTasks(auth()->id());
+>>>>>>> dev
         return response()->json($tasks);
     }
 
@@ -46,6 +55,7 @@ class TaskController extends Controller
     {
 
         $request->validate($this->task->rules(), $this->task->feedback());
+<<<<<<< HEAD
         if ($request->hasFile("arquivo")) {
             $file = $request->file('arquivo');
             $extension = $request->file('arquivo')->getClientOriginalExtension();
@@ -72,6 +82,10 @@ class TaskController extends Controller
             "description" => $description ?? null,
             "attachment_url" => $url ?? null
         ]);
+=======
+        
+        $task = $this->taskService->createTask($request->all(), auth()->id());
+>>>>>>> dev
         return response()->json($task, 201);
     }
 
@@ -83,6 +97,7 @@ class TaskController extends Controller
 
         $this->authorizeTask($task);
 
+<<<<<<< HEAD
         $validated = $request->validate($this->task->rules(), $this->task->feedback());
 
         if ($request->hasFile('arquivo')) {
@@ -106,6 +121,13 @@ class TaskController extends Controller
         ]);
 
         return response()->json($task, 200);
+=======
+        $request->validate($this->task->rules(), $this->task->feedback());
+
+        $updated = $this->taskService->updateTask($task, $request->all());
+
+        return response()->json($updated, 200);
+>>>>>>> dev
     }
 
     /**
@@ -114,7 +136,12 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $this->authorizeTask($task);
+<<<<<<< HEAD
         $task->delete();
+=======
+        // $task->delete();
+        $this->taskService->deleteTask($task);
+>>>>>>> dev
         return response()->json(['message' => 'Tarefa excluída com sucesso.'], 200);
     }
 
@@ -123,9 +150,17 @@ class TaskController extends Controller
      */
     public function deleted()
     {
+<<<<<<< HEAD
         $tasks = $this->task->onlyTrashed()
             ->where('user_id', auth()->id())
             ->get();
+=======
+        $tasks = $this->taskService->getDeletedTasks(auth()->id());
+
+        if ($tasks->isEmpty()) {
+            return response()->json(['message' => 'Nenhuma tarefa deletada encontrada.'], 404);
+        }
+>>>>>>> dev
 
         if ($tasks->isEmpty()) {
             return response()->json(['message' => 'Nenhuma tarefa deletada encontrada.'], 404);
@@ -146,6 +181,7 @@ class TaskController extends Controller
         }
     }
 
+<<<<<<< HEAD
     /**
      * Retorna o diretorio apropriado para cada tipo de arquivo
      */
@@ -175,4 +211,6 @@ class TaskController extends Controller
         $stringNova = filter_var($filtro, FILTER_SANITIZE_SPECIAL_CHARS);
         return $stringNova;
     }
+=======
+>>>>>>> dev
 }

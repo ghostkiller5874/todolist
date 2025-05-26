@@ -29,14 +29,19 @@
 
 | Método | Endpoint           | Descrição                   |
 | ------ | ------------------ | --------------------------- |
+<<<<<<< HEAD
 | POST   | /api/login         | Login de usuário            |
 | POST   | /api/register      | Cadastro de usuário         |
 | POST   | /api/logout        | Logout do usuário           |
 | GET    | /api/tasks         | Listar tarefas              |
+=======
+| GET    | /api/tasks         | Listar tarefas (com filtro) |
+>>>>>>> dev
 | POST   | /api/tasks         | Criar tarefa (com arquivo)  |
 | GET    | /api/tasks/{id}    | Ver uma tarefa              |
 | PUT    | /api/tasks/{id}    | Atualizar tarefa            |
 | DELETE | /api/tasks/{id}    | Soft delete                 |
+<<<<<<< HEAD
 
 __legenda__: base_url = http://localhost:8000
 
@@ -74,6 +79,10 @@ __legenda__: base_url = http://localhost:8000
 
 - ### Listar tarefas deletadas -- necessidade de parâmetros
     > url: base_url/api/tasks/deleted
+=======
+| GET    | /api/tasks/deleted | Listar tarefas deletadas    |
+
+>>>>>>> dev
 
 ## Explicações técnicas e observações
 > - Autenticação via Sanctum
