@@ -51,9 +51,16 @@ class User extends Authenticatable
         return [
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:3',
         ];
     }
+    public function rulesLogin(){
+        return [
+            'email' => 'required|string|email|max:100',
+            'password' => 'required|string|min:3',
+        ];
+    }
+    //'password' => 'required|string|min:6|confirmed',
 
     public function feedback(){
         return [

@@ -1,22 +1,23 @@
 <?php
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TaskController;
+
+use App\Http\Controllers\AuthControllerWeb;
+use App\Http\Controllers\TaskControllerWeb;
 use Illuminate\Support\Facades\Route;
 
-// Auth (telas web)
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
 
-// Tasks (protegidas)
-Route::middleware('auth')->group(function () {
-    Route::get('/', [TaskController::class, 'index'])->name('tasks.index');
-    Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+Route::get('/login', [AuthControllerWeb::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthControllerWeb::class, 'login']);
+
+Route::get('/register', [AuthControllerWeb::class, 'showRegister']);
+Route::post('/register', [AuthControllerWeb::class, 'register'])->name('register');
+
+Route::post('/logout', [AuthControllerWeb::class, 'logout'])->name('logout');
+
+Route::middleware('auth:web')->group(function () {
+    Route::get('/tasks', [TaskControllerWeb::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/create', [TaskControllerWeb::class, 'create'])->name('tasks.create');
+    Route::post('/tasks', [TaskControllerWeb::class, 'store'])->name('tasks.store');
+    Route::delete('/tasks/{id}', [TaskControllerWeb::class, 'destroy'])->name('tasks.destroy');
 });
+

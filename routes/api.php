@@ -7,13 +7,19 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// Route::middleware("auth:sanctum")->group(function(){ // ativar a autenticacao apos colocar rota de login "auth:sanctum"
-    // para validacao de usuario
+Route::middleware("auth:sanctum")->group(function(){ 
+    Route::get('/tasks/deleted', [TaskController::class, 'deleted']);
     Route::post('logout', [AuthController::class, 'logout']);
-
     Route::apiResource("tasks", TaskController::class);
-    Route::get("/tasks/deleted", [TaskController::class, 'deleted']);
-// });
+});
 
-// Route::post('/login', [AuthController::class, 'login']); 
-// Route::post('/register', [AuthController::class, 'register']); 
+Route::post('/login', [AuthController::class, 'login']); 
+Route::post('/register', [AuthController::class, 'register']); 
+
+
+// Route::middleware('auth:sanctum')->get('/test-auth', function() {
+//     return response()->json([
+//         'user_id' => auth()->id(),
+//         'user' => auth()->user(),
+//     ]);
+// });
