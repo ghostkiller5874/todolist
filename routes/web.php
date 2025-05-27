@@ -4,15 +4,12 @@ use App\Http\Controllers\AuthControllerWeb;
 use App\Http\Controllers\TaskControllerWeb;
 use Illuminate\Support\Facades\Route;
 
-<<<<<<< HEAD
 
-=======
 Route::get('/', function () {
     return auth()->check() 
         ? redirect()->route('tasks.index') 
         : redirect()->route('login');
 });
->>>>>>> dev
 
 Route::get('/login', [AuthControllerWeb::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthControllerWeb::class, 'login']);
