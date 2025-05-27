@@ -24,27 +24,6 @@ class AuthController extends Controller
     {
         $register = $request->validate($this->user->rules(), $this->user->feedback());
 
-<<<<<<< HEAD
-        $name = $this->filtro($request->name);
-        $email = $this->filtro($request->email);
-        $password = $this->filtro($request->password);
-        $user = User::create([
-            'name' => $name,
-            'email' => $email,
-            'password' => bcrypt($password),
-        ]);
-=======
-        // $name = $this->filtro($request->name);
-        // $email = $this->filtro($request->email);
-        // $password = $this->filtro($request->password);
->>>>>>> dev
-
-        // $user = User::create([
-        //     'name' => $name,
-        //     'email' => $email,
-        //     'password' => bcrypt($password),
-        // ]);
-
         $user = $this->authService->register($register);
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -73,31 +52,12 @@ class AuthController extends Controller
             ]);
 =======
         $login = $request->validate($this->user->rulesLogin(), $this->user->feedback());
-        
-        // $email = $this->filtro($request->email);
-        // $password = $this->filtro($request->password);
-
-        // $user = User::where('email', $email)->first();
-
-        // if (! $user || ! Hash::check($password, $user->password)) {
-        //     throw ValidationException::withMessages([
-        //         'email' => ['Credenciais inválidas.'],
-        //     ]);
-        // }
 
         $user = $this->authService->login($login);
         if(!$user){
             return response()->json(['message'=>'Credenciais inválidas'], 401);
 >>>>>>> dev
         }
-        // $token = $user->createToken('api-token')->plainTextToken;
-
-
-
-        // return response()->json([
-        //     'user' => $user,
-        //     'token' => $token,
-        // ], 200);
 
         return response()->json($user, 200);
     }
@@ -107,7 +67,6 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // $request->user()->currentAccessToken()->delete();
         $this->authService->logout($request->user());
         return response()->json([
             'message' => 'Logout realizado com sucesso.',
