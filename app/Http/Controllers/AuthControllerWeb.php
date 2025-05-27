@@ -27,20 +27,9 @@ class AuthControllerWeb extends Controller
 
     public function login(Request $request)
     {
-        // $response = Http::post("{$this->apiUrl}/login", [
-        //     'email' => $this->filtro($request->email),
-        //     'password' => $this->filtro($request->password)
-        // ]);
 
         $login = $request->validate($this->user->rulesLogin(), $this->user->feedback());
 
-        // if ($response->successful()) {
-        //     $token = $response->json()['token'];
-
-        //     session(['api_token' => $token]);
-
-        //     return redirect()->route('tasks.index');
-        // }
 
         $user = $this->authService->login(['email' => $login['email'], 'password' => $login['password']]);
         if (!$user) {
@@ -60,21 +49,11 @@ class AuthControllerWeb extends Controller
 
     public function register(Request $request)
     {
-        // $response = Http::post("{$this->apiUrl}/register", [
-        //     'name' => $this->filtro($request->name),
-        //     'email' => $this->filtro($request->email),
-        //     'password' => $this->filtro($request->password),
-        // ]);
         $register = $request->validate($this->user->rules(), $this->user->feedback());
-        // dd($response);
+        
 
         $user = $this->authService->register(['name'=>$register['name'],'email'=>$register['email'], 'password'=>$register['password']]);
         $token = $user->createToken('api-token')->plainTextToken;
-        // if ($response->successful()) {
-        //     $token = $response->json()['token'];
-        //     session(['api_token' => $token]);
-        //     return redirect()->route('tasks.index');
-        // }
 
         if(!$user){
             return back()->withErrors(['email' => 'Não foi possível cadastrar. Verifique os dados.']);
@@ -89,17 +68,9 @@ class AuthControllerWeb extends Controller
 
     public function logout()
     {
-        // Http::withToken(session('api_token'))
-        //     ->post("{$this->apiUrl}/logout");
-
         $this->authService->logout(Auth::user());
         session()->forget(['api_token','user_id']);
         return redirect('/login');
     }
 
-    private function filtro($filtro)
-    {
-        $stringNova = filter_var($filtro, FILTER_SANITIZE_SPECIAL_CHARS);
-        return $stringNova;
-    }
 }

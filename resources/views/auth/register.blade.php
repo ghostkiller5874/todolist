@@ -6,7 +6,6 @@
     <div class="card-body">
         <form method="POST" action="{{ route('register') }}">
             @csrf
-            {{-- <input type="hidden" name="_token" value="{{@csrf_token()}}"/> --}}
             <div class="mb-3">
                 <label>Nome</label>
                 <input type="text" name="name" class="form-control" required>
