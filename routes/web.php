@@ -32,3 +32,4 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/tasks-deleted', [TaskControllerWeb::class, 'deleted'])->name('tasks.deleted');
     Route::post('/tasks/{id}/restore', [TaskControllerWeb::class, 'restore'])->name('tasks.restore');
 });
+

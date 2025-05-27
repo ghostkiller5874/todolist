@@ -17,7 +17,7 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-    /**
+        /**
      * Cadastro de usuário
      */
     public function register(Request $request)

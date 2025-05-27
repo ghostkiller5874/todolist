@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD
+=======
 use App\Models\Task;
 use App\Services\TaskService;
+>>>>>>> dev
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -11,6 +14,19 @@ use Illuminate\Support\Facades\Http;
 class TaskControllerWeb extends Controller
 {
     // localhost, 127.0.0.1 , com ou sem porta. oque rolar 
+<<<<<<< HEAD
+    private $apiUrl = 'http://127.0.0.1:8000/api';
+
+    private function getToken() {
+        return session('api_token');
+    }
+
+    public function index(Request $request) {
+        $response = Http::withToken($this->getToken())
+            ->get("{$this->apiUrl}/tasks");
+
+        $tasks = $response->json();
+=======
     // private $apiUrl = 'http://127.0.0.1:8000/api';
 
     public function __construct(private Task $tasks, private TaskService $taskService)
@@ -35,10 +51,20 @@ class TaskControllerWeb extends Controller
             return redirect()->route('login');
         }
         $tasks = $this->taskService->getAllTasks($this->getUserId());
+>>>>>>> dev
 
         return view('tasks.index', compact('tasks'));
     }
 
+<<<<<<< HEAD
+    public function create() {
+        return view('tasks.create');
+    }
+
+    public function store(Request $request) {
+        $response = Http::withToken($this->getToken())
+            ->post("{$this->apiUrl}/tasks", $request->all());
+=======
     public function create()
     {
         if (!session()->has('api_token')) {
@@ -97,10 +123,21 @@ class TaskControllerWeb extends Controller
         }
 
         $this->taskService->deleteTask($task);
+>>>>>>> dev
 
         return redirect()->route('tasks.index');
     }
 
+<<<<<<< HEAD
+    public function destroy($id) {
+        Http::withToken($this->getToken())
+            ->delete("{$this->apiUrl}/tasks/{$id}");
+
+        return redirect()->route('tasks.index');
+    }
+
+    
+=======
     public function deleted()
     {
         if (!session()->has('api_token')) {
@@ -122,4 +159,5 @@ class TaskControllerWeb extends Controller
 
         return redirect()->route('tasks.index')->with('success', 'Tarefa restaurada com sucesso!');
     }
+>>>>>>> dev
 }
