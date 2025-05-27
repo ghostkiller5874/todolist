@@ -53,7 +53,11 @@ class TaskControllerWeb extends Controller
             return redirect()->route('login');
         }
         $request->validate($this->tasks->rules(), $this->tasks->feedback());
-
+      
+        if(!$request->arquivo){
+            $request['arquivo'] = null;
+        }
+        
         $this->taskService->createTask($request->all(), $this->getUserId());
         return redirect()->route('tasks.index');
     }
@@ -66,6 +70,7 @@ class TaskControllerWeb extends Controller
         $task = $this->tasks->findOrFail($id);
         return view('tasks.forrm', compact('task'));
     }
+    
     public function update(Request $request, $id)
     {
         if (!session()->has('api_token')) {
