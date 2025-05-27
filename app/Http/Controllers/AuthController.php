@@ -17,7 +17,7 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-    /**
+        /**
      * Cadastro de usuário
      */
     public function register(Request $request)
@@ -38,25 +38,11 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-<<<<<<< HEAD
-        $request->validate($this->user->rulesLogin(), $this->user->feedback());
-        
-        $email = $this->filtro($request->email);
-        $password = $this->filtro($request->password);
-
-        $user = User::where('email', $email)->first();
-
-        if (! $user || ! Hash::check($password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Credenciais inválidas.'],
-            ]);
-=======
         $login = $request->validate($this->user->rulesLogin(), $this->user->feedback());
 
         $user = $this->authService->login($login);
         if(!$user){
             return response()->json(['message'=>'Credenciais inválidas'], 401);
->>>>>>> dev
         }
 
         return response()->json($user, 200);
@@ -73,25 +59,4 @@ class AuthController extends Controller
         ]);
     }
 
-<<<<<<< HEAD
-    // HELPERS
-
-    private function filtro($filtro)
-    {
-        $stringNova = filter_var($filtro, FILTER_SANITIZE_SPECIAL_CHARS);
-        return $stringNova;
-    }
-
-    // VIEWS
-
-    public function showRegisterForm()
-    {
-        return view('auth.register');
-    }
-    public function showLoginForm()
-    {
-        return view('auth.login');
-    }
-=======
->>>>>>> dev
 }
