@@ -29,8 +29,8 @@ class TaskService
     {
         $taskData = [
             'user_id' => $userId,
-            'title' => $this->sanitize($data['title']),
-            'description' => $this->sanitize($data['description']) ?? null,
+            'title' => $this->filtroXss($data['title']),
+            'description' => $this->filtroXss($data['description']) ?? null,
             'attachment_url' => $this->uploadFile($data['arquivo']) ?? null
         ];
         return $this->task->create($taskData);
@@ -45,8 +45,8 @@ class TaskService
             $task->attachment_url = $this->uploadFile($data['arquivo']);
         }
 
-        $task->title = $this->sanitize($data['title']);
-        $task->description = $this->sanitize($data['description']) ?? null;
+        $task->title = $this->filtroXss($data['title']);
+        $task->description = $this->filtroXss($data['description']) ?? null;
         $task->save();
 
         return $task;
@@ -96,7 +96,7 @@ class TaskService
         }
     }
 
-    private function sanitize($value)
+    private function filtroXss($value)
     {
         return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
     }
