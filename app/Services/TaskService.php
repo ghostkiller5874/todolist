@@ -15,6 +15,7 @@ class TaskService
     {
         return $this->task->where('user_id', $userId)
             ->whereNull('deleted_at')
+            ->orderBy('title','asc')
             ->paginate(10);
     }
 
